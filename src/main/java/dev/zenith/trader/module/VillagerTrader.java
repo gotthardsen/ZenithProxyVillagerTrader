@@ -473,7 +473,9 @@ public class VillagerTrader extends Module {
 
     private int countItem(int id) {
         int count = 0;
-        for (var item : CACHE.getPlayerCache().getPlayerInventory()) {
+        var inv = CACHE.getPlayerCache().getPlayerInventory();
+        for (int i = 9; i <= 44; i++) {
+            var item = inv.get(i);
             if (item == Container.EMPTY_STACK) continue;
             if (item.getId() == id) {
                 count += item.getAmount();
@@ -484,8 +486,9 @@ public class VillagerTrader extends Module {
 
     private int countInvEmptySlots() {
         int count = 0;
-        for (int i = 9; i < 45; i++) {
-            if (CACHE.getPlayerCache().getPlayerInventory().get(i) == Container.EMPTY_STACK) {
+        var inv = CACHE.getPlayerCache().getPlayerInventory();
+        for (int i = 9; i <= 44; i++) {
+            if (inv.get(i) == Container.EMPTY_STACK) {
                 count++;
             }
         }
@@ -502,7 +505,9 @@ public class VillagerTrader extends Module {
 
     private int countSlotUsages(int id) {
         int count = 0;
-        for (var item : CACHE.getPlayerCache().getPlayerInventory()) {
+        var inv = CACHE.getPlayerCache().getPlayerInventory();
+        for (int i = 9; i <= 44; i++) {
+            var item = inv.get(i);
             if (item == Container.EMPTY_STACK) continue;
             if (item.getId() == id) {
                 count++;
