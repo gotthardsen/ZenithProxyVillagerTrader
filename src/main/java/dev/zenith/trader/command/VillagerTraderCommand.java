@@ -41,7 +41,9 @@ public class VillagerTraderCommand extends Command {
               `villagerTradeRestockWait` -> seconds it waits after all villagers are out of stock. 1200 = 1 minecraft day
               `maxSpendPerTrade` -> max emeralds to spend per trade
               `buyItemStoreStacksThreshold` -> how many stacks/slots of items to buy before it stores them
+              `emeraldStoreStacksThreshold` -> If you sell emeralds might overflow. Set this to store emeralds in store chest
               `waitForInteractTimeout` -> timeout for server interactions like opening villager trade window
+              `enabledSell` -> 1 for on and 0 for off
               """)
             .usageLines(
                 "on/off",
@@ -49,12 +51,15 @@ public class VillagerTraderCommand extends Command {
                 "professions clear",
                 "buyItems add/del <item>",
                 "buyItems clear",
+                "sellItem <item>",
+                "enabledSell <int>",
                 "restockStacks <int>",
                 "restockChest <x> <y> <z>",
                 "storeChest <x> <y> <z>",
                 "villagerTradeRestockWait <seconds>",
                 "maxSpendPerTrade <int>",
                 "buyItemStoreStacksThreshold <int>",
+                "emeraldStoreStacksThreshold <int>",
                 "waitForInteractTimeout <ticks>"
             )
             .build();
@@ -138,6 +143,11 @@ public class VillagerTraderCommand extends Command {
                     c.getSource().getEmbed()
                         .title("Items Cleared");
                 })))
+            .then(literal("sellItem").then(argument("itemName", item()).executes(c -> {
+                PLUGIN_CONFIG.restockStacks = getInteger(c, "itemName");
+                c.getSource().getEmbed()
+                        .title("Sell item");
+            })))
             .then(literal("restockStacks").then(argument("stackCount", integer(1, 36)).executes(c -> {
                 PLUGIN_CONFIG.restockStacks = getInteger(c, "stackCount");
                 c.getSource().getEmbed()
@@ -152,6 +162,11 @@ public class VillagerTraderCommand extends Command {
                 PLUGIN_CONFIG.storeChest = getBlockPos(c, "pos");
                 c.getSource().getEmbed()
                     .title("Store Chest Set");
+            })))
+            .then(literal("restockSellChest").then(argument("pos", blockPos()).executes(c -> {
+                PLUGIN_CONFIG.restockSellChest = getBlockPos(c, "pos");
+                c.getSource().getEmbed()
+                        .title("Sell Chest Set");
             })))
             .then(literal("villagerTradeRestockWait").then(argument("seconds", integer(1, (int) TimeUnit.MINUTES.toSeconds(30))).executes(c -> {
                 PLUGIN_CONFIG.villagerTradeRestockWaitSeconds = getInteger(c, "seconds");
@@ -168,6 +183,16 @@ public class VillagerTraderCommand extends Command {
                 c.getSource().getEmbed()
                     .title("Buy Item Store Stacks Threshold Set");
             })))
+            .then(literal("emeraldStoreStacksThreashold").then(argument("stackCount", integer(1, 36)).executes(c -> {
+                PLUGIN_CONFIG.emeraldStoreStacksThreshold = getInteger(c, "stackCount");
+                c.getSource().getEmbed()
+                        .title("Emeralds Store Stacks Threshold Set");
+            })))
+            .then(literal("selling").then(argument("state", integer(0,1)).executes(c -> {
+                PLUGIN_CONFIG.enabledSell = getInteger(c, "state")  == 1;
+                c.getSource().getEmbed()
+                        .title("Selling activation");
+            })))
             .then(literal("waitForInteractTimeout").then(argument("ticks", integer(1, 1000)).executes(c -> {;
                 PLUGIN_CONFIG.waitForInteractTimeoutTicks = getInteger(c, "ticks");
                 c.getSource().getEmbed()
@@ -181,8 +206,11 @@ public class VillagerTraderCommand extends Command {
             .addField("Villager Trader", toggleStr(PLUGIN_CONFIG.enabled))
             .addField("Professions", PLUGIN_CONFIG.villagerProfessions.stream().map(p -> p.name().toLowerCase()).collect(Collectors.joining(", ", "[", "]")))
             .addField("Buy Items", "[" + String.join(", ", PLUGIN_CONFIG.buyItems) + "]")
+            .addField("Sell Item", PLUGIN_CONFIG.sellItem)
+            .addField("Selling", toggleStr(PLUGIN_CONFIG.enabledSell))
             .addField("Restock Stacks", PLUGIN_CONFIG.restockStacks)
             .addField("Restock Chest", "||" + (CONFIG.discord.reportCoords ? PLUGIN_CONFIG.restockChest : "Coords disabled") + "||")
+            .addField("Restock Sell Chest", "||" + (CONFIG.discord.reportCoords ? PLUGIN_CONFIG.restockSellChest : "Coords disabled") + "||")
             .addField("Store Chest", "||" + (CONFIG.discord.reportCoords ? PLUGIN_CONFIG.storeChest : "Coords disabled") + "||")
             .addField("Villager Trade Restock Wait", PLUGIN_CONFIG.villagerTradeRestockWaitSeconds + "s")
             .addField("Max Spend Per Trade", PLUGIN_CONFIG.maxSpendPerTrade)
