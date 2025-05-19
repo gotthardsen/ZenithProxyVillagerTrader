@@ -200,7 +200,7 @@ public class VillagerTrader extends Module {
                     return;
                 }
                 int itemCount = countItem(getSellId());
-                info("sell items ({}): {}", PLUGIN_CONFIG.sellItem, itemCount);
+                info("Getting {}: {}", PLUGIN_CONFIG.sellItem, itemCount);
                 if (itemCount < PLUGIN_CONFIG.restockStacks * 9) {
                     var restockSellChest = PLUGIN_CONFIG.restockSellChest;
                     restockSellPathingFuture = BARITONE.rightClickBlock(restockSellChest.x(), restockSellChest.y(), restockSellChest.z());
@@ -323,7 +323,7 @@ public class VillagerTrader extends Module {
                     int maxTradesPerShiftClick = Math.min(maxTradesPerInputStack, maxTradesPerOutputStack);
 
                     for (int j = 0; j < availableTradeCount; j+= maxTradesPerShiftClick) {
-                        info("trading ({}): {} -> {}", cost, ItemRegistry.REGISTRY.get(trade.getFirstInput().getId()).name(), ItemRegistry.REGISTRY.get(trade.getOutput().getId()).name());
+                        info("Trading (cost: {}): {} -> {}", cost, ItemRegistry.REGISTRY.get(trade.getFirstInput().getId()).name(), ItemRegistry.REGISTRY.get(trade.getOutput().getId()).name());
                         actions.add(new SelectTrade(offersPacket.getContainerId(), i));
                         actions.add(new ShiftClick(offersPacket.getContainerId(), 2, ShiftClickItemAction.LEFT_CLICK));
                     }
@@ -339,7 +339,7 @@ public class VillagerTrader extends Module {
             case TRADING_AWAIT_PURCHASE -> {
                 if (purchaseFuture.isCompleted()) {
                     if (countBuyItemSlotUsages() > PLUGIN_CONFIG.buyItemStoreStacksThreshold) {
-                        info("Items slots: {}", countBuyItemSlotUsages());
+                        info("Bought items slots: {}", countBuyItemSlotUsages());
                         setState(State.STORE_GO_TO_CHEST);
                     } else if (countItem(ItemRegistry.EMERALD.id()) < 64) {
                         info("Emeralds: {}", countItem(ItemRegistry.EMERALD.id()));
@@ -376,7 +376,7 @@ public class VillagerTrader extends Module {
                     if(countSlotUsages(ItemRegistry.EMERALD.id()) > PLUGIN_CONFIG.emeraldStoreStacksThreshold) {
                         IntSet itemIds = new IntOpenHashSet();
                         itemIds.add(ItemRegistry.EMERALD.id());
-                        info("storing {} emeralds", countSlotUsages(ItemRegistry.EMERALD.id()) - PLUGIN_CONFIG.emeraldStoreStacksThreshold);
+                        info("Storing {} emeralds", countSlotUsages(ItemRegistry.EMERALD.id()) - PLUGIN_CONFIG.emeraldStoreStacksThreshold);
                         actions.addAll(
                                 InventoryActionMacros.deposit(
                                         openContainer.getContainerId(),
@@ -450,7 +450,7 @@ public class VillagerTrader extends Module {
     }
 
     private void setState(State newState) {
-        info("State change: {} -> {}", state, newState);
+        debug("State change: {} -> {}", state, newState);
         this.state = newState;
     }
 
